@@ -1,114 +1,99 @@
 package poo.udla.meRualesFlores;
 
-import javax.swing.*;
 import java.sql.Connection;
 import java.util.Scanner;
 
 public class Main {
+
     public static void main(String[] args) {
         Utilidades util = new Utilidades();
-        Connection conn = null;
-        conn = util.getConnection();
+        Connection conn = util.getConnection();
         Scanner sc = new Scanner(System.in);
-        int seguir;
-        int seguir2 = 0;
-        String tipo;
 
-        Inter vid = new Videojuegos("", 0.0, 0, "", "", 0.0);
-        Inter cos = new Consolas("", 0.0, 0, "", "");
+        // Objetos polimórficos
+        Inter videojuegos = new Videojuegos("", 0.0, 0, "", "", 0.0);
+        Inter consolas   = new Consolas("", 0.0, 0, "", "");
 
-        if (conn != null) {
-            System.out.println("Conectados ..!!");
-        } else {
-            System.out.println("NO Conectado ...!!");
+        if (conn == null) {
+            System.out.println("Error de conexión con la base de datos");
+            return;
         }
+        System.out.println("Conectado a la base de datos");
 
+        int opcionPrincipal;
         do {
-            System.out.println("Ingrese el tipo de producto?");
-            System.out.println("Consolas, Video Juegos, Decoracion, Salir");
-            tipo = sc.nextLine();
-            if (tipo.equalsIgnoreCase("Video Juegos")) {
-                seguir = 0;
-                do {
-                    System.out.println("Video Juegos");
-                    menu();
-                    int opcion = sc.nextInt();
-                    sc.nextLine();
-                    switch (opcion) {
-                        case 1:
-                            System.out.println("Agregar un producto");
-                            vid.ingresoDatos(conn);
-                            break;
-                        case 2:
-                            System.out.println("Editar un producto");
-                            vid.editar(conn);
-                            break;
-                        case 3:
-                            System.out.println("Buscar un producto");
-                            vid.obtener(conn,2);
-                            break;
-                        case 4:
-                            System.out.println("Eliminar un producto");
-                            vid.eliminar(conn);
-                            break;
-                        case 5:
-                            /**Salir**/
-                            seguir = 1;
-                            break;
-                    }
-                } while (seguir != 1);
-            } else if (tipo.equalsIgnoreCase("Consolas")) {
-                seguir = 0;
-                do {
-                    System.out.println("Consolas");
-                    menu();
-                    int opcion = sc.nextInt();
-                    sc.nextLine();
-                    switch (opcion) {
-                        case 1:
-                            System.out.println("Agregar un producto");
-                            cos.ingresoDatos(conn);
-                            break;
-                        case 2:
-                            System.out.println("Editar un producto");
-                            cos.editar(conn);
-                            break;
-                        case 3:
-                            System.out.println("Buscar un producto");
-                            cos.obtener(conn,2);
-                            break;
-                        case 4:
-                            System.out.println("Eliminar un producto");
-                            cos.eliminar(conn);
-                            break;
-                        case 5:
-                            seguir = 1;
-                            break;
-                    }
-                } while (seguir != 1);
-
-            } else if (tipo.equalsIgnoreCase("Decoracion")) {
-                System.out.println("Decoracion");
-
-
-            } else if (tipo.equalsIgnoreCase("Salir")) {
-                seguir2 = 1;
-                System.out.println("Saliendo....");
+            opcionPrincipal = menuPrincipal(sc);
+            switch (opcionPrincipal) {
+                case 1:
+                    gestionarProducto(videojuegos, conn, sc);
+                    break;
+                case 2:
+                    gestionarProducto(consolas, conn, sc);
+                    break;
+                case 3:
+                    //gestionarProducto(decoracion, conn, sc);
+                    break;
+                case 4:
+                    System.out.println("Saliendo del sistema...");
+                    break;
+                default:
+                    System.out.println("Opción inválida");
             }
-            else {
-                System.out.println("Opcion incorrecta");
-            }
-        }while (seguir2 != 1);
 
+        } while (opcionPrincipal != 4);
+        sc.close();
     }
-    public static void menu() {
-        System.out.println("Menu");
+
+    // ================= MENÚ PRINCIPAL =================
+    public static int menuPrincipal(Scanner sc) {
+        System.out.println("\n===== TIPO DE PRODUCTO =====");
+        System.out.println("1. Videojuegos");
+        System.out.println("2. Consolas");
+        System.out.println("3. Decoracion");
+        System.out.println("4. Salir");
+        System.out.print("Seleccione una opción: ");
+        int opcion = sc.nextInt();
+        return opcion;
+    }
+
+    // ================= MENÚ DE OPCIONES =================
+    public static int menuOpciones(Scanner sc) {
+        System.out.println("\n===== MENÚ =====");
         System.out.println("1. Ingresar");
         System.out.println("2. Editar");
         System.out.println("3. Buscar");
         System.out.println("4. Eliminar");
         System.out.println("5. Regresar");
+        System.out.print("Seleccione una opción: ");
+        return sc.nextInt();
     }
 
+    // ================= GESTIÓN DE PRODUCTOS =================
+    public static void gestionarProducto(Inter producto, Connection conn, Scanner sc) {
+        int opcion;
+        do {
+            opcion = menuOpciones(sc);
+            sc.nextLine();
+            switch (opcion) {
+                case 1:
+                    producto.ingresoDatos(conn);
+                    break;
+                case 2:
+                    producto.editar(conn);
+                    break;
+                case 3:
+                    producto.obtener(conn, 2);
+                    break;
+                case 4:
+                    producto.eliminar(conn);
+                    break;
+                case 5:
+                    System.out.println("Regresando al menú principal...");
+                    break;
+                default:
+                    System.out.println("Opción inválida");
+            }
 
+        } while (opcion != 5);
+    }
 }
