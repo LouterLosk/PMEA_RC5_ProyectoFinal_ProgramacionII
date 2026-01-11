@@ -37,7 +37,7 @@ public class Main {
                     switch (opcion) {
                         case 1:
                             System.out.println("Agregar un producto");
-                            vid.ingresoDatos(conn, tipo);
+                            vid.ingresoDatos(conn);
                             break;
                         case 2:
                             System.out.println("Editar un producto");
@@ -67,7 +67,7 @@ public class Main {
                     switch (opcion) {
                         case 1:
                             System.out.println("Agregar un producto");
-                            cos.ingresoDatos(conn, tipo);
+                            cos.ingresoDatos(conn);
                             break;
                         case 2:
                             System.out.println("Editar un producto");
@@ -78,6 +78,8 @@ public class Main {
                             cos.obtener(conn,2);
                             break;
                         case 4:
+                            System.out.println("Eliminar un producto");
+                            cos.eliminar(conn);
                             break;
                         case 5:
                             seguir = 1;

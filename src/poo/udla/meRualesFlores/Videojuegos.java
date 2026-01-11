@@ -49,11 +49,8 @@ public class Videojuegos extends Producto implements Inter {
     }
 
     /**Metodos de la interface**/
-
-
-
     @Override
-    public void ingresoDatos(Connection conn,String Tipo) {
+    public void ingresoDatos(Connection conn) {
         System.out.println("Ingresar los datos del videojuego");
         System.out.println("Nombre del videojuego: ");
         setNombre(sc.nextLine());
@@ -61,7 +58,8 @@ public class Videojuegos extends Producto implements Inter {
         setPrecio(sc.nextDouble());
         sc.nextLine();
         setFechaPublicacion(ingresoFecha());
-        setTipo(Tipo);
+        System.out.println("Tipo del videojuego: ");
+        setTipo(sc.nextLine());
         System.out.println("Duracion del videojuego(Horas): ");
         setDuracion(sc.nextDouble());
         sc.nextLine();
@@ -96,9 +94,10 @@ public class Videojuegos extends Producto implements Inter {
     @Override
     public void eliminar(Connection conn) {
         int id = obtener(conn,1);
-        String sql = "DELETE  FROM videojuegos WHERE idVideojuegos= " + id;
+        String sql = "DELETE  FROM videojuegos WHERE idVideojuegos = ?" ;
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1,id);
             int resultado = ps.executeUpdate();
 
             if(resultado > 0 ){
@@ -117,7 +116,9 @@ public class Videojuegos extends Producto implements Inter {
     public void editar(Connection conn) {
         System.out.println("Editar");
         int id = obtener(conn,1);
-
+        if (id == 0){
+            return;
+        }
         sc.nextLine();
         System.out.print("Nuevo nombre: ");
         String nombre = sc.nextLine();
@@ -156,74 +157,78 @@ public class Videojuegos extends Producto implements Inter {
     }
 
     @Override
-    public int obtener(Connection conn , int num) {
+    public int obtener(Connection conn, int num) {
+
         int opcion = 1;
         if (num == 2) {
-            opcion = 0;
-            System.out.println("Buscar por id o mostar todos los datos de los video Juegos");
-            System.out.println("1.Id   2.Todo");
+            System.out.println("Buscar por id o mostrar todos los datos de los Videojuegos");
+            System.out.println("1. Id   2. Todo");
             opcion = sc.nextInt();
             sc.nextLine();
         }
-            if (opcion == 1) {
-                System.out.println("Ingrese el id del item que desea buscar: ");
-                int id = sc.nextInt();
-                String sql = "SELECT * FROM sistema_ventas.videojuegos WHERE idVideojuegos = " + id;
-                try{
-                    PreparedStatement ps = conn.prepareStatement(sql);
-                    ResultSet rs = ps.executeQuery(sql);
-                    while(rs.next()){
-                        Videojuegos vid = new Videojuegos (
-                                rs.getString(2),
-                                rs.getDouble(3),
-                                rs.getInt(1),
-                                rs.getString(4),
-                                rs.getString(5),
-                                rs.getDouble(6)
-                        );
-                        System.out.println(vid.toString());
-                        return rs.getInt(1);
-                    }
 
-                } catch(Exception ex) {
-                    ex.printStackTrace();
+        if (opcion == 1) {
+            System.out.print("Ingrese el id del item que desea buscar: ");
+            int id = sc.nextInt();
+
+            String sql = "SELECT * FROM sistema_ventas.videojuegos WHERE idVideojuegos = ?";
+
+            try {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ps.setInt(1, id);
+                ResultSet rs = ps.executeQuery();
+
+                if (rs.next()) {
+                    Videojuegos vid = new Videojuegos(
+                            rs.getString(2),
+                            rs.getDouble(3),
+                            rs.getInt(1),
+                            rs.getString(4),
+                            rs.getString(5),
+                            rs.getDouble(6)
+                    );
+                    System.out.println(vid.toString());
+                    return rs.getInt(1);
+                } else {
+                    System.out.println("El ID ingresado NO existe.");
                 }
-            }else if (opcion == 2) {
-                int id;
-                int max = obtenerMaxIdVideojuegos(conn);
-                for (id = 0;id <= max; id++){
-                    String sql = "SELECT * FROM sistema_ventas.videojuegos WHERE idVideojuegos = " + id;
-                    try{
-                        PreparedStatement ps = conn.prepareStatement(sql);
-                        ResultSet rs = ps.executeQuery(sql);
-                        while(rs.next()){
-                            Videojuegos vid = new Videojuegos (
-                                    rs.getString(2),
-                                    rs.getDouble(3),
-                                    rs.getInt(1),
-                                    rs.getString(4),
-                                    rs.getString(5),
-                                    rs.getDouble(6)
-                            );
-                            System.out.println(vid.toString());
-                            //return rs.getInt(1);
-                        }
-                    } catch(Exception ex) {
-                        ex.printStackTrace();
-                    }
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
-            System.out.println();
+
+        } else if (opcion == 2) {
+            String sql = "SELECT * FROM sistema_ventas.videojuegos";
+            try {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery();
+
+                while (rs.next()) {
+                    Videojuegos vid = new Videojuegos(
+                            rs.getString(2),
+                            rs.getDouble(3),
+                            rs.getInt(1),
+                            rs.getString(4),
+                            rs.getString(5),
+                            rs.getDouble(6)
+                    );
+                    System.out.println(vid.toString());
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
         return 0;
     }
 
+
     @Override
     public String toString() {
         return "Videojuegos{" +
-                "nombre=" + getNombre() +
-                ", precio=" + getPrecio() +
-                ", fechaPublicacion='" + fechaPublicacion + '\'' +
-                ", tipo='" + tipo + '\'' +
+                "ID = " + getId() +
+                ", nombre = " + getNombre() +
+                ", precio = " + getPrecio() +
+                ", fechaPublicacion = '" + fechaPublicacion + '\'' +
+                ", tipo = '" + tipo + '\'' +
                 ", duracion=" + duracion +
                 '}';
     }
