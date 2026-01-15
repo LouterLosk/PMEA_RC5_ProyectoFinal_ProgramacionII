@@ -10,12 +10,23 @@ public class Producto {
     private String nombre;
     private double precio;
     private int id;
+    private int stock;
     Scanner sc = new Scanner(System.in);
 
-    public Producto(String nombre, double precio, int id) {
+    public Producto(String nombre, double precio, int id, int stock) {
         this.nombre = nombre;
         this.precio = precio;
         this.id = id;
+        this.stock = stock;
+    }
+
+    // GETTERS
+    public int getStock() {
+        return stock;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
     }
 
     public String getNombre() {

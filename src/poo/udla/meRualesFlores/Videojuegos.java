@@ -12,15 +12,12 @@ public class Videojuegos extends Producto implements Inter {
     Scanner sc = new Scanner(System.in);
 
     /**Constructores**/
-    public Videojuegos(String nombre, double precio, int id, String fechaPublicacion, String tipo, Double duracion) {
-        super(nombre, precio, id);
+    public Videojuegos(String nombre, double precio, int id, int stock,
+                       String fechaPublicacion, String tipo, double duracion) {
+        super(nombre, precio, id, stock);
         this.fechaPublicacion = fechaPublicacion;
         this.tipo = tipo;
         this.duracion = duracion;
-    }
-
-    public Videojuegos(String nombre, double precio, int id) {
-        super(nombre, precio, id);
     }
 
     /**Metodos propios de java**/
@@ -54,6 +51,9 @@ public class Videojuegos extends Producto implements Inter {
         System.out.println("Ingresar los datos del videojuego");
         System.out.println("Nombre del videojuego: ");
         setNombre(sc.nextLine());
+        System.out.println("Stock: ");
+        setStock(sc.nextInt());
+        sc.nextLine();
         System.out.println("Precio del videojuego: ");
         setPrecio(sc.nextDouble());
         sc.nextLine();
@@ -69,14 +69,15 @@ public class Videojuegos extends Producto implements Inter {
 
     @Override
     public void ingresar(Connection conn) {
-        String sql = "INSERT INTO videojuegos(nombre, precio, fechaPublicacion,tipo,duracion) VALUES (?,?,?,?,?)";
+        String sql = "INSERT INTO videojuegos(nombre, precio, stock, fechaPublicacion, tipo, duracion) VALUES (?,?,?,?,?,?)";
         try{
             PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1,getNombre());
-            ps.setDouble(2,getPrecio());
-            ps.setString(3,getFechaPublicacion());
-            ps.setString(4,getTipo());
-            ps.setDouble(5,getDuracion());
+            ps.setString(1, getNombre());
+            ps.setDouble(2, getPrecio());
+            ps.setInt(3, getStock());
+            ps.setString(4, fechaPublicacion);
+            ps.setString(5, tipo);
+            ps.setDouble(6, duracion);
 
             int resultado = ps.executeUpdate();
 
@@ -133,8 +134,11 @@ public class Videojuegos extends Producto implements Inter {
         System.out.print("Nueva duracion: ");
         Double duracion = sc.nextDouble();
 
+        System.out.println("Nuevo stock: ");
+        int newStock = sc.nextInt();
 
-        String sql = "UPDATE videojuegos SET nombre = ?, precio = ?, tipo = ?, duracion = ? WHERE idVideojuegos = ?";
+
+        String sql = "UPDATE videojuegos SET nombre = ?, precio = ?, tipo = ?, duracion = ?, stock = ? WHERE idVideojuegos = ?";
 
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -142,7 +146,8 @@ public class Videojuegos extends Producto implements Inter {
             ps.setDouble(2, precio);
             ps.setString(3, tipo);
             ps.setDouble(4, duracion);
-            ps.setInt(5, id);
+            ps.setInt(5, newStock);
+            ps.setInt(6, id);
             int resultado = ps.executeUpdate();
 
             if (resultado > 0) {
@@ -183,6 +188,7 @@ public class Videojuegos extends Producto implements Inter {
                             rs.getString(2),
                             rs.getDouble(3),
                             rs.getInt(1),
+                            rs.getInt(7),
                             rs.getString(4),
                             rs.getString(5),
                             rs.getDouble(6)
@@ -207,6 +213,7 @@ public class Videojuegos extends Producto implements Inter {
                             rs.getString(2),
                             rs.getDouble(3),
                             rs.getInt(1),
+                            rs.getInt(7),
                             rs.getString(4),
                             rs.getString(5),
                             rs.getDouble(6)
@@ -225,6 +232,7 @@ public class Videojuegos extends Producto implements Inter {
     public String toString() {
         return "Videojuegos{" +
                 "ID = " + getId() +
+                "Cantidad " + getStock() +
                 ", nombre = " + getNombre() +
                 ", precio = " + getPrecio() +
                 ", fechaPublicacion = '" + fechaPublicacion + '\'' +

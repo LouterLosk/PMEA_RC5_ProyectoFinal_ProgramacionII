@@ -11,8 +11,9 @@ public class Main {
         Scanner sc = new Scanner(System.in);
 
         // Objetos polimórficos
-        Inter videojuegos = new Videojuegos("", 0.0, 0, "", "", 0.0);
-        Inter consolas   = new Consolas("", 0.0, 0, "", "");
+        Inter videojuegos = new Videojuegos("", 0.0, 0,0, "", "", 0.0);
+        Inter consolas   = new Consolas("", 0.0, 0, 0,"", "");
+        Inter decoracion = new Decoracion("", 0.0, 0,0, "",0.0);
 
         if (conn == null) {
             System.out.println("Error de conexión con la base de datos");
@@ -31,7 +32,7 @@ public class Main {
                     gestionarProducto(consolas, conn, sc);
                     break;
                 case 3:
-                    //gestionarProducto(decoracion, conn, sc);
+                    gestionarProducto(decoracion, conn, sc);
                     break;
                 case 4:
                     System.out.println("Saliendo del sistema...");
@@ -62,7 +63,7 @@ public class Main {
         System.out.println("1. Ingresar");
         System.out.println("2. Editar");
         System.out.println("3. Buscar");
-        System.out.println("4. Eliminar");
+        System.out.println("4. Comprar");
         System.out.println("5. Regresar");
         System.out.print("Seleccione una opción: ");
         return sc.nextInt();
@@ -89,6 +90,11 @@ public class Main {
                     break;
                 case 5:
                     System.out.println("Regresando al menú principal...");
+                    try {
+                        conn.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     break;
                 default:
                     System.out.println("Opción inválida");
