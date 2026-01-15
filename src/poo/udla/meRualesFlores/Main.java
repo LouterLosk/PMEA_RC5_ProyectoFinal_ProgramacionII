@@ -63,7 +63,7 @@ public class Main {
         System.out.println("1. Ingresar");
         System.out.println("2. Editar");
         System.out.println("3. Buscar");
-        System.out.println("4. Comprar");
+        System.out.println("4. Vender");
         System.out.println("5. Regresar");
         System.out.print("Seleccione una opción: ");
         return sc.nextInt();
@@ -86,7 +86,7 @@ public class Main {
                     producto.obtener(conn, 2);
                     break;
                 case 4:
-                    producto.eliminar(conn);
+                    producto.vender(conn);
                     break;
                 case 5:
                     System.out.println("Regresando al menú principal...");

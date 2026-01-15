@@ -8,5 +8,7 @@ public interface Inter {
     public void editar(Connection conn);
     public int obtener(Connection conn,int num);
     public void ingresoDatos(Connection conn);
+    public void vender(Connection conn);
+
 
 }

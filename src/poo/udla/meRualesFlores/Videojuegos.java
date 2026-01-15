@@ -68,6 +68,62 @@ public class Videojuegos extends Producto implements Inter {
     }
 
     @Override
+    public void vender(Connection conn) {
+
+        System.out.println("=== VENTA DE VIDEOJUEGOS ===");
+
+        // Mostrar productos y seleccionar ID
+        int id = obtener(conn, 1);
+        if (id == 0) {
+            System.out.println("Producto no válido.");
+            return;
+        }
+
+        System.out.print("Ingrese la cantidad a comprar: ");
+        int cantidad = sc.nextInt();
+        sc.nextLine();
+
+        String sqlSelect = "SELECT stock, precio FROM videojuegos WHERE idVideojuegos = ?";
+        String sqlUpdate = "UPDATE videojuegos SET stock = ? WHERE idVideojuegos = ?";
+
+        try {
+            PreparedStatement ps = conn.prepareStatement(sqlSelect);
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                int stockActual = rs.getInt("stock");
+                double precio = rs.getDouble("precio");
+
+                if (cantidad > stockActual) {
+                    System.out.println("Stock insuficiente.");
+                    return;
+                }
+
+                int nuevoStock = stockActual - cantidad;
+                double total = cantidad * precio;
+
+                PreparedStatement psUpdate = conn.prepareStatement(sqlUpdate);
+                psUpdate.setInt(1, nuevoStock);
+                psUpdate.setInt(2, id);
+                psUpdate.executeUpdate();
+
+                System.out.println("✅ Venta realizada con éxito");
+                System.out.println("Cantidad vendida: " + cantidad);
+                System.out.println("Total a pagar: $" + total);
+                System.out.println("Stock restante: " + nuevoStock);
+
+            } else {
+                System.out.println("Producto no encontrado.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Override
     public void ingresar(Connection conn) {
         String sql = "INSERT INTO videojuegos(nombre, precio, stock, fechaPublicacion, tipo, duracion) VALUES (?,?,?,?,?,?)";
         try{

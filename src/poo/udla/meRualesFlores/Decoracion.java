@@ -51,6 +51,55 @@ public class Decoracion extends Producto implements Inter {
         ingresar(conn);
         System.out.println(toString());
     }
+
+    @Override
+    public void vender(Connection conn) {
+
+        System.out.println("=== VENTA DE DECORACIÓN ===");
+
+        int id = obtener(conn, 1);
+        if (id == 0) return;
+
+        System.out.print("Cantidad a comprar: ");
+        int cantidad = sc.nextInt();
+        sc.nextLine();
+
+        String sqlSelect = "SELECT stock, precio FROM decoracion WHERE idDecoracion = ?";
+        String sqlUpdate = "UPDATE decoracion SET stock = ? WHERE idDecoracion = ?";
+
+        try {
+            PreparedStatement ps = conn.prepareStatement(sqlSelect);
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                int stock = rs.getInt("stock");
+                double precio = rs.getDouble("precio");
+
+                if (cantidad > stock) {
+                    System.out.println("Stock insuficiente");
+                    return;
+                }
+
+                int nuevoStock = stock - cantidad;
+                double total = cantidad * precio;
+
+                PreparedStatement ps2 = conn.prepareStatement(sqlUpdate);
+                ps2.setInt(1, nuevoStock);
+                ps2.setInt(2, id);
+                ps2.executeUpdate();
+
+                System.out.println("Venta realizada");
+                System.out.println("Total: $" + total);
+                System.out.println("Stock restante: " + nuevoStock);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
     @Override
     public void ingresar(Connection conn) {
         String sql = "INSERT INTO decoracion(nombre, precio, stock, tipoDecorativo, tamanio) VALUES (?,?,?,?,?)";
