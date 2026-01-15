@@ -1,4 +1,4 @@
-package poo.udla.meRualesFlores;
+package poo.udla.meRualesFlores.baseDatos;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

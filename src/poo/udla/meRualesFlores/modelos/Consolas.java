@@ -1,68 +1,58 @@
-package poo.udla.meRualesFlores;
+package poo.udla.meRualesFlores.modelos;
+
+import poo.udla.meRualesFlores.Interfaces.Inter;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Scanner;
 
-public class Videojuegos extends Producto implements Inter {
-    private String fechaPublicacion;
-    private String tipo;
-    private Double duracion;
+public class Consolas extends Producto implements Inter {
+    private String edicion;
+    private String fechaLanzamiento;
     Scanner sc = new Scanner(System.in);
 
-    /**Constructores**/
-    public Videojuegos(String nombre, double precio, int id, int stock,
-                       String fechaPublicacion, String tipo, double duracion) {
+    public Consolas(String nombre, double precio, int id, int stock, String edicion, String fechaLanzamiento) {
         super(nombre, precio, id, stock);
-        this.fechaPublicacion = fechaPublicacion;
-        this.tipo = tipo;
-        this.duracion = duracion;
+        this.edicion = edicion;
+        this.fechaLanzamiento = fechaLanzamiento;
     }
 
-    /**Metodos propios de java**/
-    public String getFechaPublicacion() {
-        return fechaPublicacion;
+
+    public String getEdicion() {
+        return edicion;
     }
 
-    public void setFechaPublicacion(String fechaPublicacion) {
-        this.fechaPublicacion = fechaPublicacion;
+    public void setEdicion(String edicion) {
+        this.edicion = edicion;
     }
 
-    public String getTipo() {
-        return tipo;
+    public String getFechaLanzamiento() {
+        return fechaLanzamiento;
     }
 
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
+    public void setFechaLanzamiento(String fechaLanzamiento) {
+        this.fechaLanzamiento = fechaLanzamiento;
     }
 
-    public Double getDuracion() {
-        return duracion;
-    }
-
-    public void setDuracion(Double duracion) {
-        this.duracion = duracion;
-    }
 
     /**Metodos de la interface**/
+
     @Override
     public void ingresoDatos(Connection conn) {
-        System.out.println("Ingresar los datos del videojuego");
-        System.out.println("Nombre del videojuego: ");
-        setNombre(sc.nextLine());
+        System.out.println("Ingresar los datos de la Consola");
         System.out.println("Stock: ");
         setStock(sc.nextInt());
         sc.nextLine();
-        System.out.println("Precio del videojuego: ");
+        System.out.println("Nombre de la consola: ");
+        setNombre(sc.nextLine());
+        System.out.println("Precio de la consola: ");
         setPrecio(sc.nextDouble());
         sc.nextLine();
-        setFechaPublicacion(ingresoFecha());
-        System.out.println("Tipo del videojuego: ");
-        setTipo(sc.nextLine());
-        System.out.println("Duracion del videojuego(Horas): ");
-        setDuracion(sc.nextDouble());
-        sc.nextLine();
+        System.out.println("Fecha de lanzamiento la consola: ");
+        setFechaLanzamiento(ingresoFecha());
+        System.out.println("Edicion: ");
+        setEdicion(sc.nextLine());
         ingresar(conn);
         System.out.println(toString());
     }
@@ -70,21 +60,17 @@ public class Videojuegos extends Producto implements Inter {
     @Override
     public void vender(Connection conn) {
 
-        System.out.println("=== VENTA DE VIDEOJUEGOS ===");
+        System.out.println("=== VENTA DE CONSOLAS ===");
 
-        // Mostrar productos y seleccionar ID
         int id = obtener(conn, 1);
-        if (id == 0) {
-            System.out.println("Producto no válido.");
-            return;
-        }
+        if (id == 0) return;
 
-        System.out.print("Ingrese la cantidad a comprar: ");
+        System.out.print("Cantidad a comprar: ");
         int cantidad = sc.nextInt();
         sc.nextLine();
 
-        String sqlSelect = "SELECT stock, precio FROM videojuegos WHERE idVideojuegos = ?";
-        String sqlUpdate = "UPDATE videojuegos SET stock = ? WHERE idVideojuegos = ?";
+        String sqlSelect = "SELECT stock, precio FROM consolas WHERE idConsolas = ?";
+        String sqlUpdate = "UPDATE consolas SET stock = ? WHERE idConsolas = ?";
 
         try {
             PreparedStatement ps = conn.prepareStatement(sqlSelect);
@@ -92,29 +78,25 @@ public class Videojuegos extends Producto implements Inter {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                int stockActual = rs.getInt("stock");
+                int stock = rs.getInt("stock");
                 double precio = rs.getDouble("precio");
 
-                if (cantidad > stockActual) {
-                    System.out.println("Stock insuficiente.");
+                if (cantidad > stock) {
+                    System.out.println("Stock insuficiente");
                     return;
                 }
 
-                int nuevoStock = stockActual - cantidad;
+                int nuevoStock = stock - cantidad;
                 double total = cantidad * precio;
 
-                PreparedStatement psUpdate = conn.prepareStatement(sqlUpdate);
-                psUpdate.setInt(1, nuevoStock);
-                psUpdate.setInt(2, id);
-                psUpdate.executeUpdate();
+                PreparedStatement ps2 = conn.prepareStatement(sqlUpdate);
+                ps2.setInt(1, nuevoStock);
+                ps2.setInt(2, id);
+                ps2.executeUpdate();
 
-                System.out.println("✅ Venta realizada con éxito");
-                System.out.println("Cantidad vendida: " + cantidad);
-                System.out.println("Total a pagar: $" + total);
+                System.out.println("Venta realizada");
+                System.out.println("Total: $" + total);
                 System.out.println("Stock restante: " + nuevoStock);
-
-            } else {
-                System.out.println("Producto no encontrado.");
             }
 
         } catch (Exception e) {
@@ -122,25 +104,23 @@ public class Videojuegos extends Producto implements Inter {
         }
     }
 
-
     @Override
     public void ingresar(Connection conn) {
-        String sql = "INSERT INTO videojuegos(nombre, precio, stock, fechaPublicacion, tipo, duracion) VALUES (?,?,?,?,?,?)";
+        String sql = "INSERT INTO consolas(nombre, precio, stock, fechaLanzamiento, edicion) VALUES (?,?,?,?,?)";
         try{
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, getNombre());
             ps.setDouble(2, getPrecio());
             ps.setInt(3, getStock());
-            ps.setString(4, fechaPublicacion);
-            ps.setString(5, tipo);
-            ps.setDouble(6, duracion);
+            ps.setString(4, fechaLanzamiento);
+            ps.setString(5, edicion);
 
             int resultado = ps.executeUpdate();
 
             if(resultado > 0 ){
-                System.out.println("El Video Juego se ha insertado correctamente..");
+                System.out.println("La consola se ha insertado correctamente..");
             }else {
-                System.out.println("El Video Juego no se inserto..");
+                System.out.println("La consola Juego no se inserto..");
             }
 
         } catch(Exception ex){
@@ -150,8 +130,9 @@ public class Videojuegos extends Producto implements Inter {
 
     @Override
     public void eliminar(Connection conn) {
+        System.out.println("Eliminar");
         int id = obtener(conn,1);
-        String sql = "DELETE  FROM videojuegos WHERE idVideojuegos = ?" ;
+        String sql = "DELETE  FROM consolas WHERE idConsolas = ?" ;
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1,id);
@@ -176,7 +157,6 @@ public class Videojuegos extends Producto implements Inter {
         if (id == 0){
             return;
         }
-        sc.nextLine();
         System.out.print("Nuevo nombre: ");
         String nombre = sc.nextLine();
 
@@ -184,26 +164,22 @@ public class Videojuegos extends Producto implements Inter {
         double precio = sc.nextDouble();
         sc.nextLine();
 
-        System.out.print("Nueva categoria: ");
+        System.out.print("Nueva edicion: ");
         String tipo = sc.nextLine();
-
-        System.out.print("Nueva duracion: ");
-        Double duracion = sc.nextDouble();
 
         System.out.println("Nuevo stock: ");
         int newStock = sc.nextInt();
 
-
-        String sql = "UPDATE videojuegos SET nombre = ?, precio = ?, tipo = ?, duracion = ?, stock = ? WHERE idVideojuegos = ?";
+        String sql = "UPDATE consolas  SET nombre = ?, precio = ?, edicion = ?, stock = ? WHERE idConsolas = ?";
 
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, nombre);
             ps.setDouble(2, precio);
             ps.setString(3, tipo);
-            ps.setDouble(4, duracion);
-            ps.setInt(5, newStock);
-            ps.setInt(6, id);
+            ps.setInt(4, getStock());
+            ps.setInt(5, id);
+
             int resultado = ps.executeUpdate();
 
             if (resultado > 0) {
@@ -219,10 +195,9 @@ public class Videojuegos extends Producto implements Inter {
 
     @Override
     public int obtener(Connection conn, int num) {
-
         int opcion = 1;
         if (num == 2) {
-            System.out.println("Buscar por id o mostrar todos los datos de los Videojuegos");
+            System.out.println("Buscar por id o mostrar todos los datos de los Consolas");
             System.out.println("1. Id   2. Todo");
             opcion = sc.nextInt();
             sc.nextLine();
@@ -231,8 +206,9 @@ public class Videojuegos extends Producto implements Inter {
         if (opcion == 1) {
             System.out.print("Ingrese el id del item que desea buscar: ");
             int id = sc.nextInt();
+            sc.nextLine();
 
-            String sql = "SELECT * FROM sistema_ventas.videojuegos WHERE idVideojuegos = ?";
+            String sql = "SELECT * FROM sistema_ventas.consolas WHERE idConsolas = ?";
 
             try {
                 PreparedStatement ps = conn.prepareStatement(sql);
@@ -240,14 +216,13 @@ public class Videojuegos extends Producto implements Inter {
                 ResultSet rs = ps.executeQuery();
 
                 if (rs.next()) {
-                    Videojuegos vid = new Videojuegos(
+                    Consolas vid = new Consolas(
                             rs.getString(2),
                             rs.getDouble(3),
                             rs.getInt(1),
-                            rs.getInt(7),
-                            rs.getString(4),
+                            rs.getInt(6),
                             rs.getString(5),
-                            rs.getDouble(6)
+                            rs.getString(4)
                     );
                     System.out.println(vid.toString());
                     return rs.getInt(1);
@@ -259,20 +234,19 @@ public class Videojuegos extends Producto implements Inter {
             }
 
         } else if (opcion == 2) {
-            String sql = "SELECT * FROM sistema_ventas.videojuegos";
+            String sql = "SELECT * FROM sistema_ventas.consolas";
             try {
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery();
 
                 while (rs.next()) {
-                    Videojuegos vid = new Videojuegos(
+                    Consolas vid = new Consolas(
                             rs.getString(2),
                             rs.getDouble(3),
                             rs.getInt(1),
-                            rs.getInt(7),
+                            rs.getInt(6),
                             rs.getString(4),
-                            rs.getString(5),
-                            rs.getDouble(6)
+                            rs.getString(5)
                     );
                     System.out.println(vid.toString());
                 }
@@ -283,26 +257,22 @@ public class Videojuegos extends Producto implements Inter {
         return 0;
     }
 
-
     @Override
     public String toString() {
-        return "Videojuegos{" +
-                "ID = " + getId() +
-                "Cantidad " + getStock() +
-                ", nombre = " + getNombre() +
-                ", precio = " + getPrecio() +
-                ", fechaPublicacion = '" + fechaPublicacion + '\'' +
-                ", tipo = '" + tipo + '\'' +
-                ", duracion=" + duracion +
+        return "Consolas{" +
+                "ID = " + getId() + '\'' +
+                "Stock = " + getStock() + '\'' +
+                ", nombre = " + getNombre() + '\'' +
+                ", precio = " + getPrecio() + '\'' +
+                ", edicion = " + getEdicion() + '\'' +
+                ", fechaLanzamiento='" + fechaLanzamiento + '\'' +
                 '}';
     }
 
-    /**Metodos propios**/
-
-    public int obtenerMaxIdVideojuegos(Connection conn) {
+    public int obtenerMaxIdConsolas(Connection conn) {
 
         int maxId = 0;
-        String sql = "SELECT MAX(idVideojuegos) AS maxId FROM videojuegos";
+        String sql = "SELECT MAX(idConsolas) AS maxId FROM consolas";
 
         try {
             PreparedStatement ps = conn.prepareStatement(sql);

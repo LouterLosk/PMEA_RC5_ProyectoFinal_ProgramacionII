@@ -1,5 +1,11 @@
 package poo.udla.meRualesFlores;
 
+import poo.udla.meRualesFlores.Interfaces.Inter;
+import poo.udla.meRualesFlores.baseDatos.Utilidades;
+import poo.udla.meRualesFlores.modelos.Consolas;
+import poo.udla.meRualesFlores.modelos.Decoracion;
+import poo.udla.meRualesFlores.modelos.Videojuegos;
+
 import java.sql.Connection;
 import java.util.Scanner;
 

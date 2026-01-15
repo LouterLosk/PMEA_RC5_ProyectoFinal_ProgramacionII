@@ -1,4 +1,4 @@
-package poo.udla.meRualesFlores;
+package poo.udla.meRualesFlores.Interfaces;
 
 import java.sql.Connection;
 

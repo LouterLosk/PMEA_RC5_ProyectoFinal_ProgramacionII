@@ -1,56 +1,55 @@
-package poo.udla.meRualesFlores;
+package poo.udla.meRualesFlores.modelos;
+
+
+import poo.udla.meRualesFlores.Interfaces.Inter;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.Scanner;
 
-public class Consolas extends Producto implements Inter{
-    private String edicion;
-    private String fechaLanzamiento;
-    Scanner sc = new Scanner(System.in);
+public class Decoracion extends Producto implements Inter {
+    private String  tipoDecorativo;
+    private double tamanio;
 
-    public Consolas(String nombre, double precio, int id, int stock, String edicion, String fechaLanzamiento) {
+    public Decoracion(String nombre, double precio, int id, int stock,
+                      String tipoDecorativo, double tamanio) {
         super(nombre, precio, id, stock);
-        this.edicion = edicion;
-        this.fechaLanzamiento = fechaLanzamiento;
+        this.tipoDecorativo = tipoDecorativo;
+        this.tamanio = tamanio;
     }
 
 
-    public String getEdicion() {
-        return edicion;
+    public String getTipoDecorativo() {
+        return tipoDecorativo;
     }
 
-    public void setEdicion(String edicion) {
-        this.edicion = edicion;
+    public void setTipoDecorativo(String tipoDecorativo) {
+        this.tipoDecorativo = tipoDecorativo;
     }
 
-    public String getFechaLanzamiento() {
-        return fechaLanzamiento;
+    public double getTamanio() {
+        return tamanio;
     }
 
-    public void setFechaLanzamiento(String fechaLanzamiento) {
-        this.fechaLanzamiento = fechaLanzamiento;
+    public void setTamanio(double tamanio) {
+        this.tamanio = tamanio;
     }
 
-
-    /**Metodos de la interface**/
-
-    @Override
     public void ingresoDatos(Connection conn) {
-        System.out.println("Ingresar los datos de la Consola");
+        System.out.println("Ingresar los datos del decorativo");
+        System.out.println("Nombre del decorativo: ");
+        setNombre(sc.nextLine());
         System.out.println("Stock: ");
         setStock(sc.nextInt());
         sc.nextLine();
-        System.out.println("Nombre de la consola: ");
-        setNombre(sc.nextLine());
-        System.out.println("Precio de la consola: ");
+        System.out.println("Precio del decorativo: ");
         setPrecio(sc.nextDouble());
         sc.nextLine();
-        System.out.println("Fecha de lanzamiento la consola: ");
-        setFechaLanzamiento(ingresoFecha());
-        System.out.println("Edicion: ");
-        setEdicion(sc.nextLine());
+        System.out.println("Tipo del decorativo: ");
+        setTipoDecorativo(sc.nextLine());
+        System.out.println("Tamanio del decorativo(centimetros): ");
+        setTamanio(sc.nextDouble());
+        sc.nextLine();
         ingresar(conn);
         System.out.println(toString());
     }
@@ -58,7 +57,7 @@ public class Consolas extends Producto implements Inter{
     @Override
     public void vender(Connection conn) {
 
-        System.out.println("=== VENTA DE CONSOLAS ===");
+        System.out.println("=== VENTA DE DECORACIÓN ===");
 
         int id = obtener(conn, 1);
         if (id == 0) return;
@@ -67,8 +66,8 @@ public class Consolas extends Producto implements Inter{
         int cantidad = sc.nextInt();
         sc.nextLine();
 
-        String sqlSelect = "SELECT stock, precio FROM consolas WHERE idConsolas = ?";
-        String sqlUpdate = "UPDATE consolas SET stock = ? WHERE idConsolas = ?";
+        String sqlSelect = "SELECT stock, precio FROM decoracion WHERE idDecoracion = ?";
+        String sqlUpdate = "UPDATE decoracion SET stock = ? WHERE idDecoracion = ?";
 
         try {
             PreparedStatement ps = conn.prepareStatement(sqlSelect);
@@ -102,23 +101,24 @@ public class Consolas extends Producto implements Inter{
         }
     }
 
+
     @Override
     public void ingresar(Connection conn) {
-        String sql = "INSERT INTO consolas(nombre, precio, stock, fechaLanzamiento, edicion) VALUES (?,?,?,?,?)";
+        String sql = "INSERT INTO decoracion(nombre, precio, stock, tipoDecorativo, tamanio) VALUES (?,?,?,?,?)";
+
         try{
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, getNombre());
             ps.setDouble(2, getPrecio());
             ps.setInt(3, getStock());
-            ps.setString(4, fechaLanzamiento);
-            ps.setString(5, edicion);
-
+            ps.setString(4, tipoDecorativo);
+            ps.setDouble(5, tamanio);
             int resultado = ps.executeUpdate();
 
             if(resultado > 0 ){
-                System.out.println("La consola se ha insertado correctamente..");
+                System.out.println("El Decorativo se ha insertado correctamente..");
             }else {
-                System.out.println("La consola Juego no se inserto..");
+                System.out.println("El Decorativo no se inserto..");
             }
 
         } catch(Exception ex){
@@ -128,18 +128,17 @@ public class Consolas extends Producto implements Inter{
 
     @Override
     public void eliminar(Connection conn) {
-        System.out.println("Eliminar");
         int id = obtener(conn,1);
-        String sql = "DELETE  FROM consolas WHERE idConsolas = ?" ;
+        String sql = "DELETE  FROM Decoracion WHERE idDecoracion = ?" ;
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1,id);
             int resultado = ps.executeUpdate();
 
             if(resultado > 0 ){
-                System.out.println("El producto se ha eliminado correctamente..");
+                System.out.println("El Decorativo se ha eliminado correctamente..");
             }else {
-                System.out.println("El producto no se ha eliminado ..");
+                System.out.println("El Decorativo no se ha eliminado ..");
             }
 
 
@@ -155,6 +154,7 @@ public class Consolas extends Producto implements Inter{
         if (id == 0){
             return;
         }
+        sc.nextLine();
         System.out.print("Nuevo nombre: ");
         String nombre = sc.nextLine();
 
@@ -162,28 +162,33 @@ public class Consolas extends Producto implements Inter{
         double precio = sc.nextDouble();
         sc.nextLine();
 
-        System.out.print("Nueva edicion: ");
+        System.out.print("Nuevo tipo: ");
         String tipo = sc.nextLine();
+
+        System.out.print("Nuevo tamanio: ");
+        Double tamanio = sc.nextDouble();
+
 
         System.out.println("Nuevo stock: ");
         int newStock = sc.nextInt();
 
-        String sql = "UPDATE consolas  SET nombre = ?, precio = ?, edicion = ?, stock = ? WHERE idConsolas = ?";
+
+        String sql = "UPDATE Decoracion SET nombre = ?, precio = ?, tipo = ?, tamanio = ?, stock = ? WHERE idDecoracion = ?";
 
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, nombre);
             ps.setDouble(2, precio);
             ps.setString(3, tipo);
-            ps.setInt(4, getStock());
-            ps.setInt(5, id);
-
+            ps.setDouble(4, tamanio);
+            ps.setInt(5, newStock);
+            ps.setInt(6, id);
             int resultado = ps.executeUpdate();
 
             if (resultado > 0) {
-                System.out.println("El Videojuego se ha actualizado correctamente.");
+                System.out.println("El Decorativo se ha actualizado correctamente.");
             } else {
-                System.out.println("No se pudo actualizar el Videojuego.");
+                System.out.println("No se pudo actualizar el Decorativo.");
             }
 
         } catch (Exception ex) {
@@ -191,11 +196,13 @@ public class Consolas extends Producto implements Inter{
         }
     }
 
+
     @Override
     public int obtener(Connection conn, int num) {
+
         int opcion = 1;
         if (num == 2) {
-            System.out.println("Buscar por id o mostrar todos los datos de los Consolas");
+            System.out.println("Buscar por id o mostrar todos los datos de los Decorativos");
             System.out.println("1. Id   2. Todo");
             opcion = sc.nextInt();
             sc.nextLine();
@@ -204,9 +211,8 @@ public class Consolas extends Producto implements Inter{
         if (opcion == 1) {
             System.out.print("Ingrese el id del item que desea buscar: ");
             int id = sc.nextInt();
-            sc.nextLine();
 
-            String sql = "SELECT * FROM sistema_ventas.consolas WHERE idConsolas = ?";
+            String sql = "SELECT * FROM sistema_ventas.Decoracion WHERE idDecoracion = ?";
 
             try {
                 PreparedStatement ps = conn.prepareStatement(sql);
@@ -214,15 +220,15 @@ public class Consolas extends Producto implements Inter{
                 ResultSet rs = ps.executeQuery();
 
                 if (rs.next()) {
-                    Consolas vid = new Consolas(
+                    Decoracion dec = new Decoracion(
                             rs.getString(2),
                             rs.getDouble(3),
                             rs.getInt(1),
-                            rs.getInt(6),
+                            rs.getInt(4),
                             rs.getString(5),
-                            rs.getString(4)
+                            rs.getDouble(6)
                     );
-                    System.out.println(vid.toString());
+                    System.out.println(dec.toString());
                     return rs.getInt(1);
                 } else {
                     System.out.println("El ID ingresado NO existe.");
@@ -232,45 +238,46 @@ public class Consolas extends Producto implements Inter{
             }
 
         } else if (opcion == 2) {
-            String sql = "SELECT * FROM sistema_ventas.consolas";
+            String sql = "SELECT * FROM sistema_ventas.decoracion";
             try {
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery();
 
                 while (rs.next()) {
-                    Consolas vid = new Consolas(
+                    Decoracion dec = new Decoracion(
                             rs.getString(2),
                             rs.getDouble(3),
                             rs.getInt(1),
-                            rs.getInt(6),
-                            rs.getString(4),
-                            rs.getString(5)
+                            rs.getInt(4),
+                            rs.getString(5),
+                            rs.getDouble(6)
                     );
-                    System.out.println(vid.toString());
+                    System.out.println(dec.toString());
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
         return 0;
+
     }
 
     @Override
     public String toString() {
-        return "Consolas{" +
-                "ID = " + getId() + '\'' +
-                "Stock = " + getStock() + '\'' +
-                ", nombre = " + getNombre() + '\'' +
-                ", precio = " + getPrecio() + '\'' +
-                ", edicion = " + getEdicion() + '\'' +
-                ", fechaLanzamiento='" + fechaLanzamiento + '\'' +
+        return "Decoracion{" +
+                "ID = " + getId() +
+                "Cantidad " + getStock() +
+                ", nombre = " + getNombre() +
+                ", precio = " + getPrecio() +
+                "tipoDecorativo='" + tipoDecorativo + '\'' +
+                ", tamanio=" + tamanio +
                 '}';
     }
 
-    public int obtenerMaxIdConsolas(Connection conn) {
+    public int obtenerMaxIddecoracion(Connection conn) {
 
         int maxId = 0;
-        String sql = "SELECT MAX(idConsolas) AS maxId FROM consolas";
+        String sql = "SELECT MAX(idDecoracion) AS maxId FROM Decoracion";
 
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -286,6 +293,5 @@ public class Consolas extends Producto implements Inter{
 
         return maxId;
     }
-
 
 }

@@ -1,6 +1,5 @@
-package poo.udla.meRualesFlores;
+package poo.udla.meRualesFlores.modelos;
 
-import java.sql.Connection;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
